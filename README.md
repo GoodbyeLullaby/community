@@ -20,6 +20,23 @@
     NAME VARCHAR(50),
     token CHAR(36),
     gmt_create BIGINT,
-    gmt_modified BIGINT
-    )
+    gmt_modified BIGINT,
+    bio VARCHAR(256)
+    );
+    
+    CREATE TABLE `community`.`question`(  
+      `id` INT,
+      `title` VARCHAR(50),
+      `description` TEXT,
+      `gmt_create` BIGINT,
+      `gmt_modified` BIGINT,
+      `creator` INT,
+      `comment_count` INT DEFAULT 0,
+      `view_count` INT DEFAULT 0,
+      `like_count` INT DEFAULT 0,
+      `tag` VARCHAR(256)
+    );
+
 ```
+##命令
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
