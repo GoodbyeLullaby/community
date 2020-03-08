@@ -24,4 +24,15 @@
         comment_count = comment_count+#{commentCount,jdbcType=INTEGER}
         where id=${id}
     </update>
+    <select id="selectRelated" parameterType="com.ustc.community.model.Question" resultMap="BaseResultMap">
+        select
+            *
+        from
+           question
+        where
+            id !=#{id}
+        and
+            tag regexp #{tag}
+        limit 0,9
+    </select>
 </mapper>

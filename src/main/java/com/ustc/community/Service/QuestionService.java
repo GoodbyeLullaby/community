@@ -10,6 +10,7 @@ import com.ustc.community.mapper.UserMapper;
 import com.ustc.community.model.Question;
 import com.ustc.community.model.QuestionExample;
 import com.ustc.community.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: GoodbyeLullaby
@@ -50,7 +52,9 @@ public class QuestionService {
 		pagination.setPagination(totalPage,page);
 
 		Integer offset=size*(page-1);
-		List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(new QuestionExample(), new RowBounds(offset,size));
+		QuestionExample example = new QuestionExample();
+		example.setOrderByClause("gmt_modified desc");
+		List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset,size));
 		List<QuestionDTO> questionDTOList = new ArrayList<>();
 
 		for (Question question : questions) {
@@ -70,8 +74,10 @@ public class QuestionService {
 
 		Pagination pagination=new Pagination();
 		QuestionExample questionExample = new QuestionExample();
+		questionExample.setOrderByClause("gmt_modified desc");
 		questionExample.createCriteria()
 				.andCreatorEqualTo(userId);
+
 		Integer totalCount=(int)questionMapper.countByExample(questionExample);//计算数据总数
 		Integer totalPage=(int)Math.ceil(totalCount*1.0/size);//页码
 
@@ -117,9 +123,13 @@ public class QuestionService {
 		return questionDTO;
 
 	}
-
+//修改或者提出问题方法
 	public void createOrUpdate(Question question) {
 		if(question.getId()==null){
+			//添加问题
+			question.setCommentCount(0);
+			question.setViewCount(0);
+			question.setLikeCount(0);
 			question.setGmtCreate(System.currentTimeMillis());
 			questionMapper.insert(question);
 		}else {
@@ -138,5 +148,28 @@ public class QuestionService {
 		question.setId(id);
 		question.setViewCount(1);
 		questionExtMapper.incView(question);
+	}
+
+	public List<QuestionDTO> selectRelated(QuestionDTO queryDTO) {
+		if(StringUtils.isBlank(queryDTO.getTag())){
+			return new ArrayList<>();
+		}
+//		String[] tags = StringUtils.split(queryDTO.getTag(), "，");
+		//替换成正则表达式
+		String regexpTag = queryDTO.getTag().replace('，', '|');
+
+		//查找所有的相关问题
+		Question question = new Question();
+		question.setId(queryDTO.getId());
+		question.setTag(regexpTag);
+		List<Question> questions = questionExtMapper.selectRelated(question);
+
+		List<QuestionDTO> questionDTOS = questions.stream().map(q -> {
+			QuestionDTO questionDTO = new QuestionDTO();
+			BeanUtils.copyProperties(q, questionDTO);
+			return questionDTO;
+		}).collect(Collectors.toList());
+
+		return questionDTOS;
 	}
 }
