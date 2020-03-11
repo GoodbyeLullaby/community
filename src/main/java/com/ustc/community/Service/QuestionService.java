@@ -2,6 +2,7 @@ package com.ustc.community.service;
 
 import com.ustc.community.dto.Pagination;
 import com.ustc.community.dto.QuestionDTO;
+import com.ustc.community.dto.QuestionQueryDTO;
 import com.ustc.community.exception.CustomizeErrorCode;
 import com.ustc.community.exception.CustomizeException;
 import com.ustc.community.mapper.QuestionExtMapper;
@@ -16,7 +17,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,12 +36,18 @@ public class QuestionService {
 	@Resource
 	private UserMapper userMapper;
 
-	public Pagination list(Integer page, Integer size){
-
-
-		Pagination pagination=new Pagination();
+	public Pagination list(String search,Integer page, Integer size){
+		if(StringUtils.isNotBlank(search)){
+			String[] tags = StringUtils.split(search," ");
+			search= Arrays.stream(tags).collect(Collectors.joining("|"));
+			System.out.println(search);
+		}
+//		search="键盘";
+		Pagination<QuestionDTO> pagination=new Pagination();
 		QuestionExample questionExample = new QuestionExample();
-		Integer totalCount=(int)questionMapper.countByExample(questionExample);//计算数据总数
+		QuestionQueryDTO questionQueryDTO = new QuestionQueryDTO();
+		questionQueryDTO.setSearch(search);
+		Integer totalCount=questionExtMapper.countBySearch(questionQueryDTO);
 		Integer totalPage=(int)Math.ceil(totalCount*1.0/size);//页码
 
 		//防止page参数越界
@@ -54,7 +63,9 @@ public class QuestionService {
 		Integer offset=size*(page-1);
 		QuestionExample example = new QuestionExample();
 		example.setOrderByClause("gmt_modified desc");
-		List<Question> questions = questionMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(offset,size));
+		questionQueryDTO.setPage(page);
+		questionQueryDTO.setSize(size);
+		List<Question> questions = questionExtMapper.selectBySearch(questionQueryDTO);
 		List<QuestionDTO> questionDTOList = new ArrayList<>();
 
 		for (Question question : questions) {
@@ -64,7 +75,7 @@ public class QuestionService {
 			questionDTO.setUser(user);
 			questionDTOList.add(questionDTO);
 		}
-		pagination.setQuestions(questionDTOList);
+		pagination.setData(questionDTOList);
 //		System.out.println(questions.toString());
 
 		return pagination;
@@ -72,7 +83,7 @@ public class QuestionService {
 
 	public Pagination listByUserId(Long userId, Integer page, Integer size) {
 
-		Pagination pagination=new Pagination();
+		Pagination<QuestionDTO> pagination=new Pagination();
 		QuestionExample questionExample = new QuestionExample();
 		questionExample.setOrderByClause("gmt_modified desc");
 		questionExample.createCriteria()
@@ -105,7 +116,7 @@ public class QuestionService {
 			questionDTO.setUser(user);
 			questionDTOList.add(questionDTO);
 		}
-		pagination.setQuestions(questionDTOList);
+		pagination.setData(questionDTOList);
 //		System.out.println(questions.toString());
 
 		return pagination;

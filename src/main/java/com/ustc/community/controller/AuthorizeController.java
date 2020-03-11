@@ -5,6 +5,7 @@ import com.ustc.community.dto.AccessToken;
 import com.ustc.community.dto.GithubUser;
 import com.ustc.community.model.User;
 import com.ustc.community.provider.GithubProvicder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ import java.util.UUID;
  * @Date: 2020/2/23
  */
 @Controller
-
+@Slf4j
 public class AuthorizeController {
 	@Resource
 	private GithubProvicder githubProvicder;
@@ -71,7 +72,7 @@ public class AuthorizeController {
 			return "redirect:/";
 		}else {
 			//登录失败
-			System.out.println("登录失败");
+			log.error("登录失败 callback get github error :{}",githubUser);
 			return "redirect:/";
 		}
 	}
