@@ -123,6 +123,8 @@ public class CommentService {
 		List<CommentDTO> commentDTOS = comments.stream().map(comment -> {
 			CommentDTO commentDTO = new CommentDTO();
 			BeanUtils.copyProperties(comment, commentDTO);
+			commentDTO.setName(userMap.get(comment.getCommentator()).getName());
+			commentDTO.setAvatarUrl(userMap.get(comment.getCommentator()).getAvatarUrl());
 			commentDTO.setUser(userMap.get(comment.getCommentator()));
 			return commentDTO;
 		}).collect(Collectors.toList());

@@ -78,7 +78,7 @@ function collapseComments(e) {
                         "class": "media-left"
                     }).append($("<img/>", {
                         "class": "media-object img-rounded",
-                        "src": comment.user.avatarUrl,
+                        "src": comment.avatarUrl,
                         "style":"width:42px;height:42px;"
                     }));
 
@@ -86,20 +86,18 @@ function collapseComments(e) {
                         "class": "media-body"
                     }).append($("<h6/>", {
                         "class": "media-heading",
-                        "html": comment.user.name
+                        "html": comment.name
                     })).append($("<div/>", {
                         "html": comment.content
                     })).append($("<div/>", {
-                        "style":"margin-top:10px;"
+                        "class": "menu"
                     }).append($("<span/>", {
                         "class": "pull-right",
-                        "html": moment(comment.gmtCreate).format('HH:mm YYYY/MM/DD'),
-                        "style":"color:grey;font-size:16px;"
+                        "html": moment(comment.gmtCreate).format('YYYY-MM-DD')
                     })));
 
                     var mediaElement = $("<div/>", {
-                        "class": "media",
-                        "style":"margin-bottom:15px;border-bottom: 1px solid #eee;padding-bottom: 5px;"
+                        "class": "media"
                     }).append(mediaLeftElement).append(mediaBodyElement);
 
                     var commentElement = $("<div/>", {
@@ -127,7 +125,7 @@ function selectTag(e) {
     var previous = $("#tag").val();
     if (previous.indexOf(value) == -1) {
         if (previous) {
-            $("#tag").val(previous + '，' + value);
+            $("#tag").val(previous + ',' + value);
         } else {
             $("#tag").val(value);
         }

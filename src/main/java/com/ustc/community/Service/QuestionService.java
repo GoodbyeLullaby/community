@@ -63,7 +63,7 @@ public class QuestionService {
 		Integer offset=size*(page-1);
 		QuestionExample example = new QuestionExample();
 		example.setOrderByClause("gmt_modified desc");
-		questionQueryDTO.setPage(page);
+		questionQueryDTO.setPage(offset);
 		questionQueryDTO.setSize(size);
 		List<Question> questions = questionExtMapper.selectBySearch(questionQueryDTO);
 		List<QuestionDTO> questionDTOList = new ArrayList<>();
