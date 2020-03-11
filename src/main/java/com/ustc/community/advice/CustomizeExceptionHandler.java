@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ustc.community.dto.ResultDTO;
 import com.ustc.community.exception.CustomizeErrorCode;
 import com.ustc.community.exception.CustomizeException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +19,7 @@ import java.io.PrintWriter;
  * @Author: GoodbyeLullaby
  * @Date: 2020/3/4
  */
+@Slf4j
 @ControllerAdvice
 public class CustomizeExceptionHandler {
 	@ExceptionHandler(Exception.class)
@@ -46,6 +48,7 @@ public class CustomizeExceptionHandler {
 			if(e instanceof CustomizeException){
 				model.addAttribute("message",e.getMessage());
 			}else {
+				log.error(e.getMessage());
 				model.addAttribute("message","服务冒烟了，稍后再试试！！！");
 			}
 			return new ModelAndView("error");
