@@ -43,8 +43,9 @@ public class GithubProvicder {
 		Request request=new Request.Builder().url(url).build();
 		System.out.println(url);
 		System.out.println(request.toString());
+		Response response =null;
 		try {
-			Response response = client.newCall(request).execute();
+			response = client.newCall(request).execute();
 			String str=response.body().string();
 			System.out.println(str);
 			GithubUser githubUser = JSON.parseObject(str, GithubUser.class);
