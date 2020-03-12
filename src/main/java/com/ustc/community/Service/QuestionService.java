@@ -167,7 +167,7 @@ public class QuestionService {
 		}
 //		String[] tags = StringUtils.split(queryDTO.getTag(), "，");
 		//替换成正则表达式
-		String regexpTag = queryDTO.getTag().replace('，', '|');
+		String regexpTag = queryDTO.getTag().replace(',', '|');
 
 		//查找所有的相关问题
 		Question question = new Question();
